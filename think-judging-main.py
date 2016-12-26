@@ -42,7 +42,7 @@ def separate_results(parsed_results):
 
 def write_output(bins, bin_name):
 	paper_list = bins[bin_name]
-	with open(bin_name+".docx", 'ab') as f:
+	with open(bin_name+".docx", 'a') as f:
 		for paper in paper_list:
 			f.write(paper + "\n\n")
 			f.write("Judge 1:\n\n")
@@ -52,18 +52,18 @@ def write_output(bins, bin_name):
 
 
 def write_judging_results(f, results):
-	f.write("Judge Name: " + results["judge"] + "\n")
+	f.write("Judge Name: " + results["judge"] + "\n\n")
 	f.write("Area: " + results["area"] + "\n")
-	f.write("Summary: " + results["summary"] + "\n")
+	f.write("Summary: " + results["summary"] + "\n\n")
 	f.write("Impact: " + results["impact"] + "\n")
 	f.write("Innovation: " + results["innovation"] + "\n")
 	f.write("Clarity: " + results["clarity"] + "\n")
-	f.write("Feasibility: " + results["feasibility"] + "\n")
-	f.write("General Notes: " + results["benefit"] + "\n")
-	f.write("Personal Benefit to Applicant: " + results["gen-notes"] + "\n")
-	f.write("What's Good: " + results["good"] + "\n")
-	f.write("What's Bad: " + results["bad"] + "\n")
-	f.write("Decision: " + results["decision"] + "\n")
+	f.write("Feasibility: " + results["feasibility"] + "\n\n")
+	f.write("General Notes: " + results["benefit"] + "\n\n")
+	f.write("Personal Benefit to Applicant: " + results["gen-notes"] + "\n\n")
+	f.write("What's Good: " + results["good"] + "\n\n")
+	f.write("What's Bad: " + results["bad"] + "\n\n")
+	f.write("Decision: " + results["decision"] + "\n\n")
 	f.write("Final Notes: " + results["addl-notes"] + "\n\n")
 
 
