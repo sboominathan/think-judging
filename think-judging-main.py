@@ -1,4 +1,5 @@
 import csv
+from docx import Document
 
 def parse_results():
 	with open("think-judging-results.csv", "rU") as f:
@@ -9,15 +10,15 @@ def parse_results():
 			insert_results(parsed_results, row)
 		bins = separate_results(parsed_results)
 		for bin in bins:
-			write_output(bins, bin)
+			write_output_new(bins, bin)
 
 
 def insert_results(results, row):
-	title = row[2]
+	title = row[2].lower()
 	judge_number = "judge1" if title not in results else "judge2"
 	if title not in results:
 		results[title] = {}
-	results[title][judge_number] = {"judge": row[1], "area": row[3], "summary": row[4], "impact": row[5],\
+	results[title][judge_number] = {"judge": row[1], "area": row[3], "summary": row[4], "impact": row[5], \
 									 "innovation": row[6], "clarity": row[7], "feasibility": row[8], \
 									"gen-notes": row[9], "benefit": row[10], "good": row[11], "bad": row[12],\
 									 "decision": row[13], "addl-notes": row[14]}
@@ -40,32 +41,52 @@ def separate_results(parsed_results):
 			bins.setdefault('2n',{})[paper] = parsed_results[paper]
 	return bins
 
-def write_output(bins, bin_name):
+def write_output_new(bins, bin_name):
 	paper_list = bins[bin_name]
-	with open(bin_name+".docx", 'a') as f:
-		for paper in paper_list:
-			f.write(paper + "\n\n")
-			f.write("Judge 1:\n\n")
-			write_judging_results(f, paper_list[paper]["judge1"])
-			f.write("Judge 2:\n\n")
-			write_judging_results(f, paper_list[paper]["judge2"])
+	document = Document()
+	for paper in paper_list:
+		document.add_heading(paper.title(), 0)
+		document.add_heading('Judge 1: ' + paper_list[paper]["judge1"]["judge"] , level=1)
+		write_judging_results_new(document, paper_list[paper]["judge1"])
+		document.add_heading('Judge 2: ' + paper_list[paper]["judge2"]["judge"], level=1)
+		write_judging_results_new(document, paper_list[paper]["judge2"])
+		document.add_page_break()
+	document.save(bin_name + ".docx")
 
+def write_judging_results_new(document, results):
+	document.add_heading("Area: " + results["area"], level=2)
 
-def write_judging_results(f, results):
-	f.write("Judge Name: " + results["judge"] + "\n\n")
-	f.write("Area: " + results["area"] + "\n")
-	f.write("Summary: " + results["summary"] + "\n\n")
-	f.write("Impact: " + results["impact"] + "\n")
-	f.write("Innovation: " + results["innovation"] + "\n")
-	f.write("Clarity: " + results["clarity"] + "\n")
-	f.write("Feasibility: " + results["feasibility"] + "\n\n")
-	f.write("General Notes: " + results["benefit"] + "\n\n")
-	f.write("Personal Benefit to Applicant: " + results["gen-notes"] + "\n\n")
-	f.write("What's Good: " + results["good"] + "\n\n")
-	f.write("What's Bad: " + results["bad"] + "\n\n")
-	f.write("Decision: " + results["decision"] + "\n\n")
-	f.write("Final Notes: " + results["addl-notes"] + "\n\n")
+	document.add_heading("Summary: ", level=2)
+	document.add_paragraph(results["summary"])
 
+	table = document.add_table(rows=1, cols=4, style= "Light Shading Accent 1")
+	hdr_cells = table.rows[0].cells
+	hdr_cells[0].text = 'Impact'
+	hdr_cells[1].text = 'Innovation'
+	hdr_cells[2].text = 'Clarity'
+	hdr_cells[3].text = 'Feasibility'
+	row_cells = table.add_row().cells
+	row_cells[0].text = results["impact"]
+	row_cells[1].text = results["innovation"]
+	row_cells[2].text = results["clarity"]
+	row_cells[3].text = results["feasibility"]
+
+	document.add_heading("General Notes: ", level=2)
+	document.add_paragraph(results["gen-notes"])
+
+	document.add_heading("Personal Benefit to Applicant: ", level=2)
+	document.add_paragraph(results["benefit"])
+
+	document.add_heading("What's Good: ", level=2)
+	document.add_paragraph(results["good"])
+
+	document.add_heading("What's Bad: ", level=2)
+	document.add_paragraph(results["bad"])
+
+	document.add_heading("Decision: " + results["decision"], level=1)
+
+	document.add_heading("Final Notes: ", level=2)
+	document.add_paragraph(results["addl-notes"])
 
 def main():
 	parse_results()
