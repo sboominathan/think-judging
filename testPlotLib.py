@@ -5,7 +5,7 @@ import numpy as np
 
 def get_avgs():
     scores = {}
-    with open("think-judging-results.csv", "r", newline = None) as f:
+    with open("think_judging_responses_2017.csv", "rU") as f:
         raw_results = csv.reader(f)
         categoryScores = {}
         next(raw_results, None)
@@ -22,6 +22,7 @@ def get_avgs():
     
 def insert_results(results, row):
     title = row[2]
+    print title
     judge_number = "judge1" if title not in results else "judge2"
     if title not in results:
         results[title] = {}
@@ -41,7 +42,6 @@ def graph_results():
         plt.xticks(index,["impact","innovation", "Clarity", "Feasibility"])
         plt.ylim([0,5])
         results[proj.lower()]=fig.savefig(proj.lower() + '.png')
-        #plt.show()
     
 def main():
     graph_results()

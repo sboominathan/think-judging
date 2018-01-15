@@ -1,60 +1,85 @@
 import csv
 from docx import Document
-from testPlotLib import graph_results
+# from testPlotLib import graph_results
 
 def parse_results():
-	with open("think-judging-results.csv", "rU") as f:
+    with open("think_judging_responses_2018.csv", "rU", encoding="ISO-8859-1") as f:
          parsed_results = {}
          raw_results = csv.reader(f)
          next(raw_results, None)
+         judge_counts = {}
+         paper_count = {}
          for row in raw_results:
-             insert_results(parsed_results, row)
+             insert_results(parsed_results, row, judge_counts, paper_count)
+         print(len(parsed_results))
+
+         # Debugging which papers don't have identical titles
+         for paper, count in paper_count.items():
+            if count == 1:
+                print(paper)
+
+         print(sum(judge_counts.values()))
          bins = separate_results(parsed_results)
+
+         # print(len(bins))
+         # for bin in bins:
+         #    print(bin, len(bins[bin]))
+
          for bin in bins:
              write_output_new(bins, bin)
 
 
-def insert_results(results, row):
-	title = row[2].lower()
-	judge_number = "judge1" if title not in results else "judge2"
-	if title not in results:
-		results[title] = {}
-	results[title][judge_number] = {"judge": row[1], "area": row[3], "summary": row[4], "impact": row[5], \
-									 "innovation": row[6], "clarity": row[7], "feasibility": row[8], \
-									"gen-notes": row[9], "benefit": row[10], "good": row[11], "bad": row[12],\
-									 "decision": row[13], "addl-notes": row[14]}
+def insert_results(results, row, judge_counts, paper_count):
+    title = row[2].lower()
+    # print title
+    judge_number = "judge1" if title not in results else "judge2"
+    # print judge_number
+    if title not in results:
+        results[title] = {}
+        paper_count[title] = 1
+    else:
+        paper_count[title] += 1
+    # if row[13] == "Yes":
+    if row[1] not in judge_counts:
+        judge_counts[row[1]] = 1
+    else: 
+        judge_counts[row[1]] += 1
+    results[title][judge_number] = {"judge": row[1], "area": row[3], "summary": row[4], "impact": row[5], \
+                                     "innovation": row[6], "clarity": row[7], "feasibility": row[8], \
+                                    "gen-notes": row[9], "benefit": row[10], "good": row[11], "bad": row[12],\
+                                     "decision": row[13], "addl-notes": row[14]}
 
 def separate_results(parsed_results):
-	bins = {}
-	for paper in parsed_results:
-		decisions = sorted([parsed_results[paper]["judge1"]["decision"], parsed_results[paper]["judge2"]["decision"]])
-		if decisions == ["Yes","Yes"]:
-			bins.setdefault('2y',{})[paper] = parsed_results[paper]
-		elif decisions == ["Maybe","Yes"]:
-			bins.setdefault('1y1m',{})[paper] = parsed_results[paper]
-		elif decisions == ["No","Yes"]:
-			bins.setdefault('1n1y',{})[paper] = parsed_results[paper]
-		elif decisions == ["Maybe","Maybe"]:
-			bins.setdefault('2m',{})[paper] = parsed_results[paper]
-		elif decisions == ["Maybe","No"]:
-			bins.setdefault('1m1n',{})[paper] = parsed_results[paper]
-		elif decisions == ["No","No"]:
-			bins.setdefault('2n',{})[paper] = parsed_results[paper]
-	return bins
+    bins = {}
+    for paper in parsed_results:
+        decisions = sorted([parsed_results[paper]["judge1"]["decision"], parsed_results[paper]["judge2"]["decision"]])
+        if decisions == ["Yes","Yes"]:
+            bins.setdefault('2y',{})[paper] = parsed_results[paper]
+        elif decisions == ["Maybe","Yes"]:
+            bins.setdefault('1y1m',{})[paper] = parsed_results[paper]
+        elif decisions == ["No","Yes"]:
+            bins.setdefault('1n1y',{})[paper] = parsed_results[paper]
+        elif decisions == ["Maybe","Maybe"]:
+            bins.setdefault('2m',{})[paper] = parsed_results[paper]
+        elif decisions == ["Maybe","No"]:
+            bins.setdefault('1m1n',{})[paper] = parsed_results[paper]
+        elif decisions == ["No","No"]:
+            bins.setdefault('2n',{})[paper] = parsed_results[paper]
+    return bins
 
 def write_output_new(bins, bin_name):
       paper_list = bins[bin_name]
       document = Document()
-      graph_results()
+      # graph_results()
       for paper in paper_list:
          document.add_heading(paper.title(), 0)
          document.add_heading('Judge 1: ' + paper_list[paper]["judge1"]["judge"] , level=1)
          write_judging_results_new(document, paper_list[paper]["judge1"])
          document.add_heading('Judge 2: ' + paper_list[paper]["judge2"]["judge"], level=1)
          write_judging_results_new(document, paper_list[paper]["judge2"])
-         document.add_picture(paper+'.png')
+         # document.add_picture(paper+'.png')
          document.add_page_break()
-      document.save(bin_name + ".docx")
+      document.save(bin_name + "_2018.docx")
 
 def write_judging_results_new(document, results):
     document.add_heading("Area: " + results["area"], level=2)
@@ -92,6 +117,6 @@ def write_judging_results_new(document, results):
     document.add_paragraph(results["addl-notes"])
 
 def main():
-	parse_results()
+    parse_results()
 
 if __name__ == "__main__": main()
