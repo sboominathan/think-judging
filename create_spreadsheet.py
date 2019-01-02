@@ -37,14 +37,16 @@ def create_judging_spreadsheet():
 	# Write username, project title, project areas, and Dropbox link to CSV file
 	with open(OUTPUT_FILE_NAME, 'w') as csvfile:
 		application_writer = csv.writer(csvfile, delimiter=',')
+		application_writer.writerow(["Username", "Title", "Project Areas", "Dropbox Link", "Submitted?", "Partner?"])
 		for app in submitted_apps:
 			username = app["username"]
 			project_title = app["projectSubmission"]["projectTitle"]
 			areas = app["projectQuestions"]["projectAreas"]
 			project_link = app["projectSubmission"]["fileLink"]
 			submitted = app["projectSubmission"]["submitted"]
+			partner = app["projectSubmission"]["partner"]
 
-			application_writer.writerow([username, project_title, areas, project_link, submitted])
+			application_writer.writerow([username, project_title, areas, project_link, submitted, partner])
 
 			if len(project_link) == 0:
 				print("Bad Username: {}".format(username))
