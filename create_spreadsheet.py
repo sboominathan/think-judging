@@ -7,7 +7,7 @@ def get_submitted_apps():
 	Get list of all JSON records corresponding to submitting applications
 	'''
 
-	APP_FILE_NAME = "think_apps_12_31.json"
+	APP_FILE_NAME = "think_apps_1_1.json"
 
 	 # Read in applications JSON file
 	with open(APP_FILE_NAME) as json_file:  
@@ -31,7 +31,7 @@ def create_judging_spreadsheet():
 	submitted_apps = get_submitted_apps()
 	print("# of Applications: ", len(submitted_apps))
 
-	OUTPUT_FILE_NAME = "apps_cleaned_12_31.csv"
+	OUTPUT_FILE_NAME = "apps_cleaned_1_1.csv"
 	bad_submissions = 0
 
 	# Write username, project title, project areas, and Dropbox link to CSV file
@@ -90,5 +90,5 @@ def write_user_responses(document, application):
 	document.add_paragraph(application["projectSubmission"]["additional"])
 
 if __name__ == '__main__':
-	create_judging_spreadsheet()
-	# create_response_doc()
+	# create_judging_spreadsheet()
+	create_response_doc()
