@@ -2,7 +2,7 @@ import csv
 from docx import Document
 # from testPlotLib import graph_results
 
-def parse_results():
+def parse_results(print_bin=None):
     TOTAL_PAPER_COUNT = 277
     with open("judging_results_initial_2019.csv", "rt") as results_file:
          parsed_results = {}
@@ -16,14 +16,14 @@ def parse_results():
          for row in raw_results:
              insert_results(parsed_results, row, judge_counts, paper_count, judge_responses)
 
-         print("# of Papers Read: {}".format(len(parsed_results)))
+         # print("# of Papers Read: {}".format(len(parsed_results)))
          one_judge_papers = [paper for paper in parsed_results.keys() if paper_count[paper] == 1]
          two_judge_papers = [paper for paper in parsed_results.keys() if paper_count[paper] == 2]
 
-         print("# One judge papers: {}".format(len(one_judge_papers)))
-         print("# Two judge papers: {}".format(len(two_judge_papers)))
-         print("# Zero judge papers: {}".format(TOTAL_PAPER_COUNT-(len(one_judge_papers) + len(two_judge_papers))))
-         print("---------------------")
+         # print("# One judge papers: {}".format(len(one_judge_papers)))
+         # print("# Two judge papers: {}".format(len(two_judge_papers)))
+         # print("# Zero judge papers: {}".format(TOTAL_PAPER_COUNT-(len(one_judge_papers) + len(two_judge_papers))))
+         # print("---------------------")
 
          # Debugging which papers don't have identical titles
          # for paper, count in paper_count.items():
@@ -33,23 +33,21 @@ def parse_results():
          print('Total Number of Submissions: {}'.format(sum(judge_counts.values())))
          bins = separate_results(parsed_results)
 
-         for bin in sorted(bins.keys()):
-            print("Bin: {}, ".format(bin) + "# papers: {}".format(len(bins[bin])))
-
-         # for paper, results in bins['2m'].items():
-         #    print('Title: {}'.format(paper))
-         #    print('Judge 1: {} - {}'.format(results['judge1']['judge'], results['judge1']['decision']))
-         #    print('Judge 2: {} - {}'.format(results['judge2']['judge'], results['judge2']['decision']))
-        
-         #    print('-------------------')
-
+         # for bin in sorted(bins.keys()):
+         #    print("Bin: {}, ".format(bin) + "# papers: {}".format(len(bins[bin])))
+         if print_bin:
+             print("Papers in {} Bin".format(print_bin))
+             for paper, results in bins[print_bin].items():
+                print('Title: {}'.format(paper))
+                # print('Judge 1: {} - {}'.format(results['judge1']['judge'], results['judge1']['decision']))
+                # print('Judge 2: {} - {}'.format(results['judge2']['judge'], results['judge2']['decision']))
+            
+                # print('-------------------')
+             print('===========================================================================')
+             
          # for bin in bins:
          #     write_output_new(bins, bin)
 
-         for name, responses in judge_responses.items():
-            print("Judge: {}".format(name))
-            print("Response Distribution: {}".format(responses))
-            print("---------------------")
 
 
 def insert_results(results, row, judge_counts, paper_count, judge_responses):
@@ -160,4 +158,7 @@ def write_judging_results_new(document, results):
 
 
 if __name__ == "__main__":
-    parse_results()
+    parse_results(print_bin='2y')
+    parse_results(print_bin='1y1m')
+    parse_results(print_bin='2m')
+    parse_results(print_bin='1n1y')
