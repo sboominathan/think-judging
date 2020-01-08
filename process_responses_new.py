@@ -4,7 +4,8 @@ from collections import defaultdict
 from tqdm import tqdm
 from docx import Document
 
-RESPONSES_PATH = "PUT CSV PATH HERE"
+RESPONSES_PATH = "JUDGING RESPONSES CSV PATH HERE"
+SIGNUP_PATH = "JUDGING SIGNUP CSV PATH HERE"
 
 def get_buckets_judging_responses(responses_csv_path):
 
@@ -129,8 +130,31 @@ def generate_response_docs(responses_path_csv):
         write_output_new(responses_df,
                          bucket_name,
                          paper_list)
-        
 
+
+def create_round2_sheet(signup_csv_path,
+                        responses_csv_path):
+
+    '''
+        Create judging spreadsheet for round 2
+    '''
+
+    signup_df = pd.read_csv(signup_csv_path)
+    responses_df, response_buckets = get_buckets_judging_responses(responses_csv_path)
+    
+    signup_df_cleaned = signup_df[['Username', 'Title', 'Project Areas',
+                                   'Dropbox Link', 'Judge 1', 'Judge 2']].copy()
+    rd2_apps = signup_df_cleaned[signup_df_cleaned.Title.isin(response_buckets['2y']) |
+                                 signup_df_cleaned.Title.isin(response_buckets['1y1m']) ]
+    
+    rd2_apps_potential = signup_df_cleaned[signup_df_cleaned.Title.isin(response_buckets['1y1n']) |
+                                         signup_df_cleaned.Title.isin(response_buckets['2m'])]
+
+    rd2_apps.to_csv("round2_sheet.csv", index=None)
+    rd2_apps_potential.to_csv("round2_potential_sheet.csv", index=None)
+
+    
 if __name__ == '__main__':
     generate_response_docs(RESPONSES_PATH)
+    create_round2_sheet(SIGNUP_PATH, RESPONSES_PATH)
 
