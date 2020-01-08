@@ -39,12 +39,15 @@ def get_buckets_judging_responses(responses_csv_path):
         total_response = tuple(sorted(responses['rd2_final'].values))
         if len(total_response) == 1:
             bucket = one_judge_map[total_response]
+            response_buckets[bucket].append(title)
+
         elif len(total_response) == 2:
             bucket = two_judge_map[total_response]
+            response_buckets[bucket].append(title)
+
         else:
             print(f'{title} has > 2 judges')
         
-        response_buckets[bucket].append(title)
     
     return responses_df, response_buckets
 
